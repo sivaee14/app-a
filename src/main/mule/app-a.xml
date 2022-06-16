@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2227b81f-788b-47de-8194-3914e8145eb2" >
+		<http:listener-connection host="0.0.0.0" port="8084" />
+	</http:listener-config>
+	<flow name="app-aFlow" doc:id="baec073a-aae5-4932-a948-32d17d68223c" >
+		<http:listener doc:name="Listener" doc:id="941e84b0-88c3-4e1e-a798-c76e3ebc4811" config-ref="HTTP_Listener_config" path="/maven"/>
+		<logger level="INFO" doc:name="Logger" doc:id="862717c8-3e00-4e06-9d2f-1829c9fbec3f" message='#["IP value is " ++ attributes.queryParams.IP]'/>
+		<ee:transform doc:name="Transform Message" doc:id="cdbd98c2-6546-4d3a-8c4a-d6ec06c0b78b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" :"Received IP Address"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0dad2853-712c-478e-995f-5d24c1ed5193" >
+				<logger level="INFO" doc:name="Logger" doc:id="32859c3e-96ac-439e-9ab7-6ed89ce872ad" message="Error occured"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
